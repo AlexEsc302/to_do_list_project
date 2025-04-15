@@ -12,6 +12,8 @@ import org.mockito.Mock;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,8 +29,8 @@ public class ToDoServiceTest {
 
     @BeforeEach
     void setUp() {
-        toDoRepository = mock(ToDoRepository.class);  // Simulamos el repositorio
-        toDoService = new ToDoService(toDoRepository);  // Pasamos el repositorio simulado al servicio
+        toDoRepository = mock(ToDoRepository.class); 
+        toDoService = new ToDoService(toDoRepository); 
     }
 
 
@@ -108,6 +110,27 @@ public class ToDoServiceTest {
         assertEquals(Priority.MEDIUM, updatedTodo.get().getPriority());
     }
 
+    @Test
+    public void testMarkAsDone() {
+        ToDo todo = new ToDo();
+        todo.setId(1L);
+        todo.setName("Test Todo");
+        todo.setDescription("Test Description");
+        todo.setPriority(Priority.HIGH);
+        todo.setDueDate(LocalDate.now().plusDays(5));
+        todo.setDone(false);
+        todo.setCreatedAt(LocalDateTime.now());
+
+        when(toDoRepository.findById(1L)).thenReturn(Optional.of(todo));
+        when(toDoRepository.save(any(ToDo.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Optional<ToDo> updatedTodo = toDoService.markAsDone(1L);
+
+        assertTrue(updatedTodo.isPresent());
+        assertTrue(updatedTodo.get().isDone());
+        assertNotNull(updatedTodo.get().getDoneDate());
+    }
+
 
     @Test
     public void testMarkAsUndone() {
@@ -133,6 +156,57 @@ public class ToDoServiceTest {
         assertTrue(updatedTodo.isPresent());
         assertFalse(updatedTodo.get().isDone());
         assertNull(updatedTodo.get().getDoneDate());
+    }
+
+    @Test
+    public void testDeleteToDo() {
+        doNothing().when(toDoRepository).deleteById(1L);
+
+        assertDoesNotThrow(() -> toDoService.deleteToDo(1L));
+        verify(toDoRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void testGetMetrics() {
+        // Preparar datos simulados
+        ToDo todo1 = new ToDo();
+        todo1.setCreatedAt(LocalDateTime.now().minusHours(5));
+        todo1.setDoneDate(LocalDateTime.now());
+        todo1.setDone(true);
+        todo1.setPriority(Priority.HIGH);
+
+        ToDo todo2 = new ToDo();
+        todo2.setCreatedAt(LocalDateTime.now().minusHours(2));
+        todo2.setDoneDate(LocalDateTime.now());
+        todo2.setDone(true);
+        todo2.setPriority(Priority.LOW);
+
+        ToDo todo3 = new ToDo();
+        todo3.setCreatedAt(LocalDateTime.now().minusHours(4));
+        todo3.setDoneDate(LocalDateTime.now());
+        todo3.setDone(true);
+        todo3.setPriority(Priority.HIGH);
+
+        when(toDoRepository.findByDoneTrue()).thenReturn(List.of(todo1, todo2, todo3));
+
+        // Ejecutar
+        Map<String, Object> metrics = toDoService.getMetrics();
+
+        // Validaciones
+        assertNotNull(metrics);
+        assertTrue(metrics.containsKey("doneCount"));
+        assertEquals(3, metrics.get("doneCount"));
+
+        assertTrue(metrics.containsKey("overall"));
+        assertTrue(metrics.get("overall") instanceof String);
+
+        assertTrue(metrics.containsKey("byPriority"));
+        Map<String, String> byPriority = (Map<String, String>) metrics.get("byPriority");
+        assertEquals(3, byPriority.size());
+        assertTrue(byPriority.containsKey("HIGH"));
+        assertTrue(byPriority.containsKey("LOW"));
+        assertTrue(byPriority.containsKey("MEDIUM"));
+
     }
 
 
