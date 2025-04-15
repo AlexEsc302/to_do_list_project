@@ -25,40 +25,107 @@ const Filters: React.FC<FilterProps> = ({ onFilterChange }) => {
     }
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
-        <label>
+    <div style={filtersContainerStyle}>
+        <div style={filterGroupStyle}>
+        <label style={filterLabelStyle}>
             Name:
             <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                style={{ margin: '0 1rem' }}
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={filterInputStyle}
+            placeholder="Search by name"
             />
         </label>
+        </div>
 
-        <label>
+        <div style={filterGroupStyle}>
+        <label style={filterLabelStyle}>
             Priority:
-            <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ marginRight: '1rem' }}>
-                <option value="all">All</option>
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
+            <select value={priority} onChange={(e) => setPriority(e.target.value)} style={filterSelectStyle}>
+            <option value="all">All</option>
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
             </select>
         </label>
+        </div>
 
-        <label>
+        <div style={filterGroupStyle}>
+        <label style={filterLabelStyle}>
             State:
-            <select value={done} onChange={(e) => setDone(e.target.value)} style={{ margin: '0 1rem' }}>
-                <option value="all">All</option>
-                <option value="true">Done</option>
-                <option value="false">Undone</option>
+            <select value={done} onChange={(e) => setDone(e.target.value)} style={filterSelectStyle}>
+            <option value="all">All</option>
+            <option value="true">Done</option>
+            <option value="false">Undone</option>
             </select>
         </label>
+        </div>
 
-        <button onClick={handleChange}>Search</button>
-        <button onClick={handleReset}>Reset</button>
+        <div style={filterButtonGroupStyle}>
+        <button onClick={handleChange} style={filterButtonStyle}>Search</button>
+        <button onClick={handleReset} style={filterButtonStyle}>Reset</button>
+        </div>
     </div>
-  );
+    );
+};
+
+const filtersContainerStyle = {
+  display: 'flex',
+  gap: '1rem',
+  marginBottom: '1.5rem',
+  backgroundColor: '#fff',
+  padding: '1.5rem',
+  borderRadius: '8px',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+};
+
+const filterGroupStyle = {
+  display: 'flex',
+  alignItems: 'center',
+};
+
+const filterLabelStyle = {
+  marginRight: '0.5rem',
+  fontWeight: 'bold',
+  color: '#555',
+};
+
+const filterInputStyle = {
+  padding: '0.75rem',
+  borderRadius: '6px',
+  border: '1px solid #ccc',
+  fontSize: '0.8rem',
+  minWidth: '150px',
+};
+
+const filterSelectStyle = {
+  padding: '0.75rem',
+  borderRadius: '6px',
+  border: '1px solid #ccc',
+  fontSize: '1rem',
+  minWidth: '120px',
+};
+
+const filterButtonGroupStyle = {
+  display: 'flex',
+  gap: '0.5rem',
+  marginTop: '1rem',
+};
+
+const filterButtonStyle = {
+  padding: '0.75rem 1rem',
+  borderRadius: '8px',
+  border: 'none',
+  backgroundColor: '#007bff',
+  color: '#fff',
+  cursor: 'pointer',
+  fontSize: '0.8rem',
+  transition: 'background-color 0.3s ease',
+
+  '&:hover': {
+    backgroundColor: '#0056b3',
+  },
 };
 
 export default Filters;

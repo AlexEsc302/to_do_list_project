@@ -1,0 +1,13 @@
+com/example/demo/repositories/ToDoRepositoryCollections.class
+com/example/demo/dto/ToDoModify.class
+com/example/demo/services/ToDoService.class
+com/example/demo/controllers/ToDoController.class
+com/example/demo/dto/ToDoCollectionDTO.class
+com/example/demo/DemoApplication.class
+com/example/demo/entities/Priority.class
+com/example/demo/repositories/ToDoRepository.class
+com/example/demo/dto/ToDoDTO.class
+com/example/demo/models/ToDo.class
+com/example/demo/services/ToDoServiceCollections.class
+com/example/demo/services/ToDoService$1.class
+com/example/demo/dto/ToDoInsertData.class

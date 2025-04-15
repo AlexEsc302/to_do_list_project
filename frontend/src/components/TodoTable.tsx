@@ -20,20 +20,17 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
     const [sortBy, setSortBy] = useState<string>('');
     const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
     const [editValues, setEditValues] = useState<Partial<ToDo> & { dueDatePresent?: boolean }>({});
+    const [prioritySortDirection, setPrioritySortDirection] = useState<'asc' | 'desc' | null>(null);
+    const [dueDateSortDirection, setDueDateSortDirection] = useState<'asc' | 'desc' | null>(null);
 
     useEffect(() => {
         const params = new URLSearchParams();
-
-        // Filters
         Object.entries(filters).forEach(([key, value]) => {
             if (value) params.append(key, value);
         });
-
-        // Pages
         params.append('page', currentPage.toString());
         params.append('size', '10');
-
-        if (sortBy) { 
+        if (sortBy) {
             params.append('sortBy', sortBy);
         }
 
@@ -58,33 +55,54 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
             await markAsDoneTodo(todo);
         setTodos(todos.map((t) => (t.id === todo.id ? { ...t, done: true } : t)));
         }
-        
+
     } catch (error) {
         console.error('Error toggling todo done status:', error);
     }
   };
 
-  const handleSortByPriority = () => { 
-    setSortBy((prev) => (prev === 'priority_dueDate' ? '' : 'priority_dueDate')); 
+  const handleSortByPriority = () => {
+    if (prioritySortDirection === null) {
+      setSortBy('priority');
+      setPrioritySortDirection('asc');
+      setDueDateSortDirection(null);
+    } else if (prioritySortDirection === 'asc') {
+      setSortBy('priority,desc');
+      setPrioritySortDirection('desc');
+      setDueDateSortDirection(null);
+    } else {
+      setSortBy('');
+      setPrioritySortDirection(null);
+      setDueDateSortDirection(null);
+    }
   };
 
-  const handleSortByDueDate = () => { 
-    setSortBy((prev) => (prev === 'dueDate_priority' ? '' : 'dueDate_priority')); 
+  const handleSortByDueDate = () => {
+    if (dueDateSortDirection === null) {
+      setSortBy('dueDate');
+      setDueDateSortDirection('asc');
+      setPrioritySortDirection(null);
+    } else if (dueDateSortDirection === 'asc') {
+      setSortBy('dueDate,desc');
+      setDueDateSortDirection('desc');
+      setPrioritySortDirection(null);
+    } else {
+      setSortBy('');
+      setDueDateSortDirection(null);
+      setPrioritySortDirection(null);
+    }
   };
 
   const getDueDateColor = (dueDate?: string): string => {
     if (!dueDate) return 'transparent';
-  
     const due = new Date(dueDate);
     const today = new Date();
     const diffTime = due.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-    if (diffDays <= 7) return 'lightcoral';      
-    if (diffDays <= 14) return 'khaki';          
-    return 'lightgreen';                        
+    if (diffDays <= 7) return '#ffe0e0'; 
+    if (diffDays <= 14) return '#fffacd'; 
+    return '#e0ffe0'; 
   };
-  
 
   const startEditing = (todo: ToDo) => {
     setEditingTodoId(todo.id);
@@ -93,7 +111,7 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
       priority: todo.priority,
       dueDate: todo.dueDate ? todo.dueDate : undefined
     });
-  };  
+  };
 
   const saveEdit = async (id: number) => {
     try {
@@ -109,9 +127,9 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
     setEditingTodoId(null);
     setEditValues({});
   };
-  
+
   const handleDelete = async (id: number) => {
-    const confirm = window.confirm('¿Estás seguro de que deseas eliminar esta tarea?');
+    const confirm = window.confirm('Are you sure you want to delete this task?');
     if (!confirm) return;
     try {
       await deleteTodo(id);
@@ -121,90 +139,120 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
     }
   };
 
+  const getPriorityHeader = () => {
+    let indicator = '';
+    if (prioritySortDirection === 'asc') {
+      indicator = ' ⬆️';
+    } else if (prioritySortDirection === 'desc') {
+      indicator = ' ⬇️';
+    }
+    return `Priority${indicator}`;
+  };
+
+  const getDueDateHeader = () => {
+    let indicator = '';
+    if (dueDateSortDirection === 'asc') {
+      indicator = ' ⬆️';
+    } else if (dueDateSortDirection === 'desc') {
+      indicator = ' ⬇️';
+    }
+    return `Due Date${indicator}`;
+  };
+
   return (
-    <>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem'}}>
-        <thead style={{backgroundColor: 'darkcyan', color: 'white'}}>
+    <div style={tableContainerStyle}>
+      <table style={tableStyle}>
+        <thead style={tableHeaderStyle}>
           <tr>
-            <th><input type="checkbox" /></th>
-            <th>Name</th>
-            <th style={{ cursor: 'pointer' }} onClick={handleSortByPriority}> Priority {sortBy === 'priority_dueDate' } </th> 
-            <th style={{ cursor: 'pointer' }} onClick={handleSortByDueDate}> Due Date {sortBy === 'dueDate_priority' } </th>
-            <th>Actions</th>
+            <th style={tableHeaderCellStyle}><input type="checkbox" style={checkboxStyle} /></th>
+            <th style={tableHeaderCellStyle}>Name</th>
+            <th style={{ ...tableHeaderCellStyle, cursor: 'pointer', textAlign: 'center'}} onClick={handleSortByPriority}>
+              {getPriorityHeader()}
+            </th>
+            <th style={{ ...tableHeaderCellStyle, cursor: 'pointer' }} onClick={handleSortByDueDate}>
+              {getDueDateHeader()}
+            </th>
+            <th style={tableHeaderCellStyle}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {todos.map((todo) => (
-            <tr key={todo.id} style={{ borderTop: '1px solid #ccc', backgroundColor: getDueDateColor(todo.dueDate || '-') }}>          
-              <td>
-              <input type="checkbox" checked={todo.done} onChange={() => handleCheckboxChange(todo)}/>
+            <tr key={todo.id} style={{ ...tableRowStyle, backgroundColor: getDueDateColor(todo.dueDate || undefined), textAlign: 'center'}}>
+              <td style={tableCellStyle}>
+                <input type="checkbox" checked={todo.done} onChange={() => handleCheckboxChange(todo)} style={checkboxStyle} />
               </td>
 
-                {editingTodoId === todo.id ? (
-                    <>
-                        <td>
-                        <input
-                            type="text"
-                            value={editValues.name || ''}
-                            onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                        />
-                        </td>
-                        <td>
-                        <select
-                            value={editValues.priority || 'LOW'}
-                            onChange={(e) => setEditValues({ ...editValues, priority: e.target.value as Priority })}
-                        >
-                            <option value="HIGH">HIGH</option>
-                            <option value="MEDIUM">MEDIUM</option>
-                            <option value="LOW">LOW</option>
-                        </select>
-                        </td>
-                        <td>
-                        <input
-                        type="date"
-                        value={editValues.dueDate ?? ''}
-                        onChange={(e) =>
-                            setEditValues({
-                            ...editValues,
-                            dueDate: e.target.value,
-                            dueDatePresent: true
-                            })
-                        }
-                        />
-                        <button onClick={() => setEditValues({ ...editValues, dueDate: null,dueDatePresent: true})}>X</button>
-                        </td>
-                        <td>
-                            <button onClick={() => saveEdit(todo.id)}>💾</button>
-                            <button onClick={cancelEdit} style={{ marginLeft: '0.5rem' }}>✖️</button>
-                        </td>
-                        </>
-                        ) : (
-                        <>
-                        <td style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>{todo.name}</td>
-                        <td
-                            style={{
-                                textDecoration: todo.done ? 'line-through' : 'none',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            {todo.priority}
-                        </td>
-                        <td
-                            style={{
-                                textDecoration: todo.done ? 'line-through' : 'none',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            {todo.dueDate || '-'}
-                        </td>
+              {editingTodoId === todo.id ? (
+                <>
+                  <td style={tableCellStyle}>
+                    <input
+                      type="text"
+                      value={editValues.name || ''}
+                      onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
+                      style={editInputStyle}
+                    />
+                  </td>
+                  <td style={tableCellStyle}>
+                    <select
+                      value={editValues.priority || 'LOW'}
+                      onChange={(e) => setEditValues({ ...editValues, priority: e.target.value as Priority })}
+                      style={editSelectStyle}
+                    >
+                      <option value="HIGH">High</option>
+                      <option value="MEDIUM">Medium</option>
+                      <option value="LOW">Low</option>
+                    </select>
+                  </td>
+                  <td style={tableCellStyle}>
+                    <input
+                      type="date"
+                      value={editValues.dueDate ?? ''}
+                      onChange={(e) =>
+                        setEditValues({
+                          ...editValues,
+                          dueDate: e.target.value,
+                          dueDatePresent: true,
+                        })
+                      }
+                      style={editInputStyle}
+                    />
+                    <button onClick={() => setEditValues({ ...editValues, dueDate: null, dueDatePresent: true })} style={editButton}>X</button>
+                  </td>
+                  <td style={tableCellStyle}>
+                    <button onClick={() => saveEdit(todo.id)} style={actionButton}>💾</button>
+                    <button onClick={cancelEdit} style={{ ...actionButton, backgroundColor: '#dc3545', marginLeft: '0.5rem' }}>✖️</button>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td style={{ ...tableCellStyle, textDecoration: todo.done ? 'line-through' : 'none', fontWeight: todo.done ? 'normal' : 'bold' }}>{todo.name}</td>
+                  <td
+                    style={{
+                      ...tableCellStyle,
+                      textDecoration: todo.done ? 'line-through' : 'none',
+                      cursor: 'pointer',
+                      fontWeight: todo.done ? 'normal' : 'bold'
+                    }}
+                  >
+                    {todo.priority}
+                  </td>
+                  <td
+                    style={{
+                      ...tableCellStyle,
+                      textDecoration: todo.done ? 'line-through' : 'none',
+                      cursor: 'pointer',
+                      fontWeight: todo.done ? 'normal' : 'bold'
+                    }}
+                  >
+                    {todo.dueDate || '-'}
+                  </td>
 
-                        <td>
-                        <button onClick={() => startEditing(todo)}>Edit</button>
-                        <button style={{ marginLeft: '0.5rem' }} onClick={() => handleDelete(todo.id)}>Delete</button>
-                        </td>
-                    </>
-                )}
-
+                  <td style={tableCellStyle}>
+                    <button onClick={() => startEditing(todo)} style={actionButton}>Edit</button>
+                    <button style={{ ...actionButton, backgroundColor: '#dc3545', marginLeft: '0.5rem' }} onClick={() => handleDelete(todo.id)}>Delete</button>
+                  </td>
+                </>
+              )}
             </tr>
           ))}
         </tbody>
@@ -213,10 +261,92 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={setCurrentPage}
+        onPageChange={(page) => setCurrentPage(page)}
       />
-    </>
+    </div>
   );
+};
+
+const tableContainerStyle = {
+  backgroundColor: '#fff',
+  borderRadius: '8px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
+  fontFamily: 'Arial, sans-serif', 
+  fontSize: '1rem',
+  color: '#333',
+};
+
+const tableStyle = {
+  width: '100%',
+};
+
+const tableHeaderStyle = {
+  backgroundColor: '#007bff', 
+  color: '#fff',
+  fontWeight: 'bold',
+};
+
+const tableHeaderCellStyle = {
+  padding: '1rem',
+  borderBottom: '2px solid #0056b3', 
+};
+
+const tableRowStyle = {
+  borderBottom: '1px solid #eee',
+  transition: 'background-color 0.3s ease',
+
+  '&:hover': {
+    backgroundColor: '#f9f9f9',
+  },
+};
+
+const tableCellStyle = {
+  padding: '0.75rem',
+};
+
+const checkboxStyle = {
+  marginRight: '0.5rem',
+};
+
+const actionButton = {
+  padding: '0.5rem 1rem',
+  borderRadius: '6px',
+  border: 'none',
+  backgroundColor: '#28a745', 
+  color: '#fff',
+  cursor: 'pointer',
+  transition: 'background-color 0.3s ease',
+  fontSize: '0.9rem',
+
+  '&:hover': {
+    backgroundColor: '#218838',
+  },
+};
+
+const editInputStyle = {
+  padding: '0.5rem',
+  borderRadius: '4px',
+  border: '1px solid #ccc',
+  fontSize: '0.9rem',
+  width: '100%',
+};
+
+const editSelectStyle = {
+  padding: '0.5rem',
+  borderRadius: '4px',
+  border: '1px solid #ccc',
+  fontSize: '0.9rem',
+};
+
+const editButton = {
+  marginLeft: '0.5rem',
+  padding: '0.25rem 0.5rem',
+  borderRadius: '4px',
+  border: 'none',
+  backgroundColor: '#f44336', 
+  color: '#fff',
+  cursor: 'pointer',
+  fontSize: '0.8rem',
 };
 
 export default TodoTable;

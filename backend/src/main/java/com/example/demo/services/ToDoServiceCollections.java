@@ -36,7 +36,6 @@ public class ToDoServiceCollections {
             .filter(todo -> priority == null || Objects.equals(todo.getPriority(), priority))
             .collect(Collectors.toList());
 
-        // Paginación
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), filtered.size());
         List<ToDoCollectionDTO> pagedList = filtered.subList(start, end);

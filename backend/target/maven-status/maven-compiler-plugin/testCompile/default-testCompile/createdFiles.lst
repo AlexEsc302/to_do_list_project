@@ -1,0 +1,3 @@
+com/example/demo/DemoApplicationTests.class
+com/example/demo/controllers/ToDoControllerTest.class
+com/example/demo/services/ToDoServiceTest.class
