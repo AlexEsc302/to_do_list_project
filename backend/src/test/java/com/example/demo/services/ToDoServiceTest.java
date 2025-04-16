@@ -168,7 +168,6 @@ public class ToDoServiceTest {
 
     @Test
     public void testGetMetrics() {
-        // Preparar datos simulados
         ToDo todo1 = new ToDo();
         todo1.setCreatedAt(LocalDateTime.now().minusHours(5));
         todo1.setDoneDate(LocalDateTime.now());
@@ -189,10 +188,8 @@ public class ToDoServiceTest {
 
         when(toDoRepository.findByDoneTrue()).thenReturn(List.of(todo1, todo2, todo3));
 
-        // Ejecutar
         Map<String, Object> metrics = toDoService.getMetrics();
 
-        // Validaciones
         assertNotNull(metrics);
         assertTrue(metrics.containsKey("doneCount"));
         assertEquals(3, metrics.get("doneCount"));
@@ -208,7 +205,4 @@ public class ToDoServiceTest {
         assertTrue(byPriority.containsKey("MEDIUM"));
 
     }
-
-
-
 }
