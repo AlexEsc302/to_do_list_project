@@ -7,7 +7,4 @@ com\example\demo\repositories\ToDoRepository.class
 com\example\demo\dto\ToDoDTO.class
 com\example\demo\controllers\ToDoController.class
 com\example\demo\dto\ToDoInsertData.class
-com\example\demo\dto\ToDoCollectionDTO.class
-com\example\demo\services\ToDoServiceCollections.class
-com\example\demo\repositories\ToDoRepositoryCollections.class
 com\example\demo\services\ToDoService$1.class

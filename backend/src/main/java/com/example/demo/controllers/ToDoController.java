@@ -1,13 +1,12 @@
+
 package com.example.demo.controllers;
 
-import com.example.demo.dto.ToDoCollectionDTO;
 import com.example.demo.dto.ToDoDTO;
 import com.example.demo.dto.ToDoInsertData;
 import com.example.demo.dto.ToDoModify;
 import com.example.demo.entities.Priority;
 import com.example.demo.models.ToDo;
 import com.example.demo.services.ToDoService;
-import com.example.demo.services.ToDoServiceCollections;
 
 import java.util.Map;
 
@@ -25,11 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class ToDoController {
 
     private final ToDoService toDoService;
-    private final ToDoServiceCollections toDoServiceCollections;
 
-    public ToDoController(ToDoService toDoService, ToDoServiceCollections toDoServiceCollections) {
+    public ToDoController(ToDoService toDoService) {
         this.toDoService = toDoService;
-        this.toDoServiceCollections = toDoServiceCollections;
     }
 
     @GetMapping
@@ -83,34 +80,5 @@ public class ToDoController {
         return ResponseEntity.noContent().build();
     }
 
-    // Collections
-    @GetMapping("/todosC")
-    public Page<ToDoCollectionDTO> getFilteredTodos(
-            @RequestParam(required = false) Boolean done,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Priority priority,
-            Pageable pageable
-    ) {
-        return toDoServiceCollections.findFilteredTodos(done, name, priority, pageable);
-    }
 
-    @PostMapping("/todosC")
-    public ToDoCollectionDTO createToDo(@RequestBody ToDoCollectionDTO todo){
-        return toDoServiceCollections.create(todo);
-    }
-
-    @PutMapping("/todosC/{id}")
-    public ToDoCollectionDTO updateToDo(@PathVariable Long id, @RequestBody ToDoCollectionDTO updated) {
-        return toDoServiceCollections.update(id, updated);
-    }
-
-    @PostMapping("/todosC/{id}/done")
-    public void markAsDone(@PathVariable Long id) {
-        toDoServiceCollections.markAsDone(id);
-    }
-
-    @PutMapping("/todosC/{id}/undone")
-    public void markAsUndone(@PathVariable Long id) {
-        toDoServiceCollections.markAsUndone(id);
-    }
 }

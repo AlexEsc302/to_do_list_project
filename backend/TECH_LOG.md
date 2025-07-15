@@ -33,4 +33,64 @@
 
 ---
 
-All further backend improvements and refactors will be logged here in detail.
+## 2025-07-15
+### Cleanup: Removed Java Collections Implementation to Focus on JPA/H2
+
+#### Specific Changes Made
+- Deleted all code and files related to the in-memory Java Collections implementation:
+  - Removed `ToDoServiceCollections.java` (service for collections-based logic)
+  - Removed `ToDoRepositoryCollections.java` (repository for collections-based logic)
+  - Removed `ToDoCollectionDTO.java` (DTO used only for collections logic)
+- Refactored `ToDoController.java` to remove all endpoints, fields, and imports related to the collections implementation. Now only the JPA/H2-based logic remains.
+- Verified that the application compiles and runs with only the database-backed implementation.
+
+#### New Techniques or Improvements Discovered
+- **Separation of Concerns:** Learned the importance of keeping only one source of truth for data (the database) to avoid confusion and redundancy in the codebase.
+- **Incremental Refactoring:** Used Copilot to safely identify and remove all references to the collections-based logic, ensuring a clean transition to a single implementation.
+
+#### Innovations or Optimizations Implemented
+- **Simplified Backend:** The backend is now focused solely on JPA/H2, making it easier to maintain, test, and extend.
+- **Reduced Redundancy:** Eliminated duplicate logic and endpoints, streamlining the codebase and reducing potential bugs.
+
+#### Reflection on Copilot's Impact
+- Copilot quickly identified all files and code regions related to the collections implementation, making the cleanup process efficient and safe.
+- The suggestions ensured that no references to the old logic remained, preventing runtime errors and confusion.
+- Copilot's step-by-step approach helped maintain project stability during the refactor.
+
+#### Detailed Prompts Used
+- "Firts of all, we need to only keep the JPA and H2 database implementation, so lets erase everything about the Java Collections implementation, then we will improve that part, but first clean all the project so we can focus in the database implementation"
+
+---
+
+## 2025-07-15
+### Security Improvements: Dependency, Configuration, Validation, and Error Handling
+
+#### Specific Changes Made
+- Replaced hardcoded database password in `application.properties` with an environment variable (`spring.datasource.password=${DB_PASSWORD:}`) and added a comment about using environment variables for sensitive data.
+- Added a warning comment to `application.properties` to disable the H2 console in production.
+- Added a comment to `application.properties` recommending HTTPS and secure headers for production deployments.
+- Added a `GlobalExceptionHandler` class to standardize error responses and avoid leaking stack traces.
+- Added validation annotations (`@NotBlank`, `@NotNull`, `@Size`) to `ToDoInsertData` DTO fields to enforce input validation.
+- Added the `jakarta.validation-api` dependency to `pom.xml` to support validation annotations.
+
+#### Why These Changes Were Needed
+- Hardcoded credentials and exposed dev tools are common security risks (see OWASP A3:2017, A5:2017).
+- Secure error handling prevents attackers from learning about application internals (OWASP A6:2017).
+- Input validation is critical to prevent injection and ensure data integrity (OWASP A1:2017).
+- Using up-to-date, secure dependencies is essential for a safe codebase.
+
+#### Impact of the Changes
+- Credentials are no longer exposed in source code.
+- The H2 console is less likely to be left open in production.
+- Error messages are now user-friendly and do not leak sensitive information.
+- Input validation is enforced at the DTO level, reducing the risk of attacks via malformed input.
+- The codebase is more secure and ready for further enhancements (e.g., authentication/authorization).
+
+#### References
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/)
+
+#### Detailed Prompts Used
+- "Perform all the necessary security-related changes and updates in the application’s codebase..."
+
+---

@@ -5,7 +5,6 @@ import com.example.demo.dto.ToDoDTO;
 import com.example.demo.entities.Priority;
 import com.example.demo.models.ToDo;
 import com.example.demo.services.ToDoService;
-import com.example.demo.services.ToDoServiceCollections;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -37,8 +36,6 @@ public class ToDoControllerTest {
     @MockitoBean
     private ToDoService toDoService;
 
-    @MockitoBean
-    private ToDoServiceCollections toDoServiceCollections;
 
     @Test
     void testGetTodosReturnsPageOfTodos() throws Exception {
