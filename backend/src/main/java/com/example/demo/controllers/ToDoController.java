@@ -1,17 +1,17 @@
-
 package com.example.demo.controllers;
 
+import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.ToDoDTO;
 import com.example.demo.dto.ToDoInsertData;
 import com.example.demo.dto.ToDoModify;
 import com.example.demo.entities.Priority;
+import com.example.demo.exceptions.TodoNotFoundException;
 import com.example.demo.models.ToDo;
 import com.example.demo.services.ToDoService;
 
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +30,7 @@ public class ToDoController {
     }
 
     @GetMapping
-    public Page<ToDoDTO> getTodos(
+    public ResponseEntity<ApiResponse<Page<ToDoDTO>>> getTodos(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "dueDate") String sortBy,
@@ -38,11 +38,12 @@ public class ToDoController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Priority priority) {
         
-        return toDoService.getTodos(page, size, sortBy, done, name, priority);
+        Page<ToDoDTO> todos = toDoService.getTodos(page, size, sortBy, done, name, priority);
+        return ResponseEntity.ok(ApiResponse.success(todos));
     }
 
     @PostMapping
-    public ResponseEntity<ToDo> createTodo(@Validated @RequestBody ToDoInsertData request) {
+    public ResponseEntity<ApiResponse<ToDo>> createTodo(@Validated @RequestBody ToDoInsertData request) {
         ToDo todo = new ToDo();
         todo.setName(request.getName());
         todo.setDescription(request.getDescription());
@@ -50,28 +51,33 @@ public class ToDoController {
         todo.setPriority(request.getPriority());
 
         ToDo savedTodo = toDoService.save(todo);
-        return new ResponseEntity<>(savedTodo, HttpStatus.CREATED);
+        return new ResponseEntity<>(ApiResponse.success(savedTodo), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}") 
-    public ResponseEntity<ToDo> updateToDo(@PathVariable Long id, @RequestBody ToDoModify request) { 
-        return toDoService.updateToDo(id, request) .map(updated -> new ResponseEntity<>(updated, HttpStatus.OK)) .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND)); 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ToDo>> updateToDo(@PathVariable Long id, @Validated @RequestBody ToDoModify request) {
+        ToDo updated = toDoService.updateToDo(id, request)
+            .orElseThrow(() -> new TodoNotFoundException(id));
+        return ResponseEntity.ok(ApiResponse.success(updated));
     }
 
-    @PostMapping("/{id}/done") 
-    public ResponseEntity<ToDo> markTodoAsDone(@PathVariable Long id) { 
-        return toDoService.markAsDone(id) .map(todo -> new ResponseEntity<>(todo, HttpStatus.OK)) .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND)); 
+    @PostMapping("/{id}/done")
+    public ResponseEntity<ApiResponse<ToDo>> markTodoAsDone(@PathVariable Long id) {
+        ToDo todo = toDoService.markAsDone(id)
+            .orElseThrow(() -> new TodoNotFoundException(id));
+        return ResponseEntity.ok(ApiResponse.success(todo));
     }
 
     @PutMapping("/{id}/undone")
-    public ResponseEntity<ToDo> markTodoAsUndone(@PathVariable Long id) {
-        return toDoService.markAsUndone(id) .map(todo -> new ResponseEntity<>(todo, HttpStatus.OK)) .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<ApiResponse<ToDo>> markTodoAsUndone(@PathVariable Long id) {
+        ToDo todo = toDoService.markAsUndone(id)
+            .orElseThrow(() -> new TodoNotFoundException(id));
+        return ResponseEntity.ok(ApiResponse.success(todo));
     }
-    
 
     @GetMapping("/metrics")
-    public ResponseEntity<Map<String, Object>> getMetrics() {
-        return ResponseEntity.ok(toDoService.getMetrics());
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMetrics() {
+        return ResponseEntity.ok(ApiResponse.success(toDoService.getMetrics()));
     }
 
     @DeleteMapping("/{id}")

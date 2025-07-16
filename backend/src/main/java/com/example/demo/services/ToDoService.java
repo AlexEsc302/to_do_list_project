@@ -3,6 +3,8 @@ package com.example.demo.services;
 import com.example.demo.dto.ToDoDTO;
 import com.example.demo.dto.ToDoModify;
 import com.example.demo.entities.Priority;
+import com.example.demo.exceptions.TodoNotFoundException;
+import com.example.demo.exceptions.TodoValidationException;
 import com.example.demo.models.ToDo;
 import com.example.demo.repositories.ToDoRepository;
 
@@ -31,6 +33,21 @@ public class ToDoService {
 
     public ToDoService(ToDoRepository todoRepository) {
         this.todoRepository = todoRepository;
+    }
+
+    private void validateTodo(ToDo todo) {
+        if (todo.getName() == null || todo.getName().trim().isEmpty()) {
+            throw new TodoValidationException("Todo name cannot be empty");
+        }
+        if (todo.getName().length() > 100) {
+            throw new TodoValidationException("Todo name cannot be longer than 100 characters");
+        }
+        if (todo.getDescription() != null && todo.getDescription().length() > 255) {
+            throw new TodoValidationException("Todo description cannot be longer than 255 characters");
+        }
+        if (todo.getPriority() == null) {
+            throw new TodoValidationException("Todo priority must be specified");
+        }
     }
 
     public Page<ToDoDTO> getTodos(int page, int size, String sortBy, Boolean done, String name, Priority priority) {
@@ -103,6 +120,7 @@ public class ToDoService {
     }
 
     public ToDo save(ToDo todo) {
+        validateTodo(todo);
         return todoRepository.save(todo);
     }
 
@@ -110,7 +128,7 @@ public class ToDoService {
         Optional<ToDo> optionalToDo = todoRepository.findById(id);
 
         if (optionalToDo.isEmpty()) {
-            return Optional.empty();
+            throw new TodoNotFoundException(id);
         }
 
         ToDo todo = optionalToDo.get();
@@ -127,6 +145,7 @@ public class ToDoService {
             todo.setPriority(request.getPriority());
         }
 
+        validateTodo(todo);
         todoRepository.save(todo);
 
         return Optional.of(todo);
@@ -135,16 +154,18 @@ public class ToDoService {
     public Optional<ToDo> markAsDone(Long id) {
         Optional<ToDo> optionalToDo = todoRepository.findById(id);
         if (optionalToDo.isEmpty()) {
-            return Optional.empty();
+            throw new TodoNotFoundException(id);
         }
 
         ToDo todo = optionalToDo.get();
 
-        if (!todo.isDone()) {
-            todo.setDone(true);
-            todo.setDoneDate(LocalDateTime.now());
-            todoRepository.save(todo);
+        if (todo.isDone()) {
+            throw new TodoValidationException("Todo is already marked as done");
         }
+
+        todo.setDone(true);
+        todo.setDoneDate(LocalDateTime.now());
+        todoRepository.save(todo);
 
         return Optional.of(todo);
     }
@@ -152,16 +173,18 @@ public class ToDoService {
     public Optional<ToDo> markAsUndone(Long id) {
         Optional<ToDo> optionalToDo = todoRepository.findById(id);
         if (optionalToDo.isEmpty()) {
-            return Optional.empty();
+            throw new TodoNotFoundException(id);
         }
 
         ToDo todo = optionalToDo.get();
 
-        if (todo.isDone()) {
-            todo.setDone(false);
-            todo.setDoneDate(null);
-            todoRepository.save(todo);
+        if (!todo.isDone()) {
+            throw new TodoValidationException("Todo is not marked as done");
         }
+
+        todo.setDone(false);
+        todo.setDoneDate(null);
+        todoRepository.save(todo);
 
         return Optional.of(todo);
     }
