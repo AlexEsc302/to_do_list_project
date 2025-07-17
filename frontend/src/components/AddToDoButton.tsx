@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { createTodo } from '../api/ToDoApi';
+import { TodoApi } from '../api/ToDoApi';
+import { Priority } from '../types/ToDo';
 
 const AddToDoButton: React.FC<{ onAdd: () => void }> = ({ onAdd }) => {
   const [showForm, setShowForm] = useState(false);
@@ -14,14 +15,14 @@ const AddToDoButton: React.FC<{ onAdd: () => void }> = ({ onAdd }) => {
     const newToDo = {
       name,
       description,
-      priority,
+      priority: priority as Priority,
       dueDate: dueDate || null,
       done: false,
       doneDate: null,
     };
 
     try {
-      await createTodo(newToDo);
+      await TodoApi.createTodo(newToDo);
       onAdd();
       setShowForm(false);
       setName('');

@@ -1,68 +1,40 @@
-const API_BASE_URL = 'http://localhost:9090';
+import api from './apiConfig';
+import { ToDo, ToDoCreate, ToDoUpdate, TodoPage, TodoMetrics, TodoFilters } from '../types/ToDo';
 
-export const fetchTodos = async (params = '') => {
-  const response = await fetch(`${API_BASE_URL}/todos?${params}`);
-  return response.json();
-};
+export const TodoApi = {
+  fetchTodos: async (filters: TodoFilters): Promise<TodoPage> => {
+    const params = new URLSearchParams();
+    if (filters.done !== undefined) params.append('done', String(filters.done));
+    if (filters.name) params.append('name', filters.name);
+    if (filters.priority) params.append('priority', filters.priority);
+    if (filters.page !== undefined) params.append('page', String(filters.page));
+    if (filters.size !== undefined) params.append('size', String(filters.size));
+    if (filters.sortBy) params.append('sortBy', filters.sortBy);
+    
+    return await api.get(`/todos?${params.toString()}`);
+  },
 
-export const createTodo = async (todo: any) => {
-  const response = await fetch(`${API_BASE_URL}/todos`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(todo),
-  });
-  return response.json();
-};
+  createTodo: async (todo: ToDoCreate): Promise<ToDo> => {
+    return await api.post('/todos', todo);
+  },
 
-export const updateTodo = async (todo: any) => {
-    const { id, ...body } = todo;
-    const response = await fetch(`${API_BASE_URL}/todos/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-    return response.json();
-};
-  
+  updateTodo: async (id: number, todo: ToDoUpdate): Promise<ToDo> => {
+    return await api.put(`/todos/${id}`, todo);
+  },
 
-export const markAsDoneTodo = async (todo: any) => {
-    const response = await fetch(`${API_BASE_URL}/todos/${todo.id}/done`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(todo),
-    });
-    return response.json();
-};
+  markAsDone: async (id: number): Promise<ToDo> => {
+    return await api.post(`/todos/${id}/done`);
+  },
 
-export const markAsUnDoneTodo = async (todo: any) => {
-    const response = await fetch(`${API_BASE_URL}/todos/${todo.id}/undone`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(todo),
-    });
-    return response.json();
-};
+  markAsUndone: async (id: number): Promise<ToDo> => {
+    return await api.put(`/todos/${id}/undone`);
+  },
 
-export async function fetchMetrics() {
-    const response = await fetch(`${API_BASE_URL}/todos/metrics`);
-    if (!response.ok) throw new Error("Error fetching metrics");
-    return response.json();
-}
-  
-export const deleteTodo = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/todos/${id}`, {
-    method: 'DELETE',
-  });
+  fetchMetrics: async (): Promise<TodoMetrics> => {
+    return await api.get('/todos/metrics');
+  },
 
-  if (!response.ok) {
-    throw new Error('Error deleting ToDo');
+  deleteTodo: async (id: number): Promise<void> => {
+    await api.delete(`/todos/${id}`);
   }
 };

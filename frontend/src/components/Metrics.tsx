@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { fetchMetrics } from "../api/ToDoApi";
+import { TodoApi } from "../api/ToDoApi";
+import { TodoMetrics } from "../types/ToDo";
 
-interface MetricsInt {
+interface MetricsInt extends TodoMetrics {
   overall: string;
   doneCount: number;
   byPriority: Record<string, string>;
@@ -9,14 +10,37 @@ interface MetricsInt {
 
 export default function Metrics() {
   const [metrics, setMetrics] = useState<MetricsInt | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchMetrics()
-      .then((data: MetricsInt) => setMetrics(data))
-      .catch(error => console.error("Error fetching metrics:", error));
+    setLoading(true);
+    TodoApi.fetchMetrics()
+      .then((data: MetricsInt) => {
+        setMetrics(data);
+        setError(null);
+      })
+      .catch((error: unknown) => {
+        console.error("Error fetching metrics:", error);
+        setError(error instanceof Error ? error.message : 'Failed to load metrics');
+        setMetrics(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  if (!metrics) return <div style={errorStyle}>Error loading metrics.</div>;
+  if (loading) {
+    return <div style={loadingStyle}>Loading metrics...</div>;
+  }
+
+  if (error) {
+    return <div style={errorBoxStyle}>{error}</div>;
+  }
+
+  if (!metrics) {
+    return <div style={errorBoxStyle}>No metrics available.</div>;
+  }
 
   return (
     <div style={metricsContainerStyle}>
@@ -43,6 +67,22 @@ export default function Metrics() {
     </div>
   );
 }
+
+const loadingStyle = {
+  padding: '1rem',
+  textAlign: 'center' as const,
+  color: '#666',
+};
+
+const errorBoxStyle = {
+  padding: '1rem',
+  textAlign: 'center' as const,
+  color: '#dc3545',
+  backgroundColor: '#fff',
+  borderRadius: '8px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
+  marginTop: '2rem',
+};
 
 const metricsContainerStyle = {
   backgroundColor: '#fff',

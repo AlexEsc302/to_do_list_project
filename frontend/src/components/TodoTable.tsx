@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Priority, ToDo } from '../types/ToDo';
+import { Priority, ToDo, TodoFilters } from '../types/ToDo';
 import Pagination from './Pagination';
-import { markAsDoneTodo, markAsUnDoneTodo, updateTodo, deleteTodo } from '../api/ToDoApi';
+import { TodoApi } from '../api/ToDoApi';
 
 interface Props {
   filters: {
@@ -24,40 +23,42 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
     const [dueDateSortDirection, setDueDateSortDirection] = useState<'asc' | 'desc' | null>(null);
 
     useEffect(() => {
-        const params = new URLSearchParams();
-        Object.entries(filters).forEach(([key, value]) => {
-            if (value) params.append(key, value);
-        });
-        params.append('page', currentPage.toString());
-        params.append('size', '10');
-        if (sortBy) {
-            params.append('sortBy', sortBy);
-        }
+        const fetchData = async () => {
+            try {
+                const todoFilters: TodoFilters = {
+                    done: filters.done ? filters.done === 'true' : undefined,
+                    name: filters.name,
+                    priority: filters.priority as Priority | undefined,
+                    page: currentPage,
+                    size: 10,
+                    sortBy
+                };
 
-        axios
-        .get('http://localhost:9090/todos', { params })
-        .then((response) => {
-            const data = response.data;
-            setTodos(data.content);
-            setTotalPages(data.totalPages);
-        })
-        .catch((error) => {
-            console.error('Error fetching todos:', error);
-        });
+                const result = await TodoApi.fetchTodos(todoFilters);
+                setTodos(result.content);
+                setTotalPages(result.totalPages);
+            } catch (error) {
+                console.error('Error fetching todos:', error);
+                setTodos([]);
+                setTotalPages(0);
+            }
+        };
+        
+        fetchData();
     }, [filters, currentPage, sortBy]);
 
   const handleCheckboxChange = async (todo: ToDo) => {
     try {
         if(todo.done){
-            await markAsUnDoneTodo(todo);
-            setTodos(todos.map((t) => (t.id === todo.id ? { ...t, done: false } : t)));
+            const updatedTodo = await TodoApi.markAsUndone(todo.id);
+            setTodos(todos.map((t) => (t.id === todo.id ? updatedTodo : t)));
         } else {
-            await markAsDoneTodo(todo);
-        setTodos(todos.map((t) => (t.id === todo.id ? { ...t, done: true } : t)));
+            const updatedTodo = await TodoApi.markAsDone(todo.id);
+            setTodos(todos.map((t) => (t.id === todo.id ? updatedTodo : t)));
         }
-
     } catch (error) {
         console.error('Error toggling todo done status:', error);
+        // Error will be shown via toast from the API interceptor
     }
   };
 
@@ -115,12 +116,13 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
 
   const saveEdit = async (id: number) => {
     try {
-      const updated = { ...editValues, id };
-      const updatedTodo = await updateTodo(updated);
+      const updatedTodo = await TodoApi.updateTodo(id, editValues);
       setTodos(todos.map((t) => (t.id === id ? updatedTodo : t)));
       setEditingTodoId(null);
+      setEditValues({});
     } catch (error) {
       console.error('Error updating todo:', error);
+      // Error will be shown via toast from the API interceptor
     }
   };
   const cancelEdit = () => {
@@ -132,10 +134,11 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
     const confirm = window.confirm('Are you sure you want to delete this task?');
     if (!confirm) return;
     try {
-      await deleteTodo(id);
+      await TodoApi.deleteTodo(id);
       setTodos(todos.filter((t) => t.id !== id));
     } catch (error) {
       console.error('Error deleting todo:', error);
+      // Error will be shown via toast from the API interceptor
     }
   };
 
