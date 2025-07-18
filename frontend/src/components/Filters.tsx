@@ -25,107 +25,69 @@ const Filters: React.FC<FilterProps> = ({ onFilterChange }) => {
     }
 
   return (
-    <div style={filtersContainerStyle}>
-        <div style={filterGroupStyle}>
-        <label style={filterLabelStyle}>
-            Name:
+    <div className="card bg-light shadow-sm p-4 mb-4">
+      <h5 className="mb-3">Filter Tasks</h5>
+      <div className="row g-3">
+        <div className="col-md-4">
+          <div className="input-group">
+            <span className="input-group-text">
+              <i className="fas fa-search"></i>
+            </span>
             <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={filterInputStyle}
-            placeholder="Search by name"
+              type="text"
+              className="form-control"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Search by name"
+              aria-label="Task name"
             />
-        </label>
+          </div>
         </div>
-
-        <div style={filterGroupStyle}>
-        <label style={filterLabelStyle}>
-            Priority:
-            <select value={priority} onChange={(e) => setPriority(e.target.value)} style={filterSelectStyle}>
-            <option value="all">All</option>
+        
+        <div className="col-md-3">
+          <select 
+            className="form-select" 
+            value={priority} 
+            onChange={(e) => setPriority(e.target.value)}
+            aria-label="Priority filter"
+          >
+            <option value="all">All Priorities</option>
             <option value="LOW">Low</option>
             <option value="MEDIUM">Medium</option>
             <option value="HIGH">High</option>
-            </select>
-        </label>
+          </select>
         </div>
-
-        <div style={filterGroupStyle}>
-        <label style={filterLabelStyle}>
-            State:
-            <select value={done} onChange={(e) => setDone(e.target.value)} style={filterSelectStyle}>
-            <option value="all">All</option>
-            <option value="true">Done</option>
-            <option value="false">Undone</option>
-            </select>
-        </label>
+        
+        <div className="col-md-3">
+          <select 
+            className="form-select" 
+            value={done} 
+            onChange={(e) => setDone(e.target.value)}
+            aria-label="Status filter"
+          >
+            <option value="all">All Status</option>
+            <option value="true">Completed</option>
+            <option value="false">Active</option>
+          </select>
         </div>
-
-        <div style={filterButtonGroupStyle}>
-        <button onClick={handleChange} style={filterButtonStyle}>Search</button>
-        <button onClick={handleReset} style={filterButtonStyle}>Reset</button>
+        
+        <div className="col-md-2 d-flex">
+          <button 
+            onClick={handleChange} 
+            className="btn btn-primary me-2 flex-grow-1"
+          >
+            Apply
+          </button>
+          <button 
+            onClick={handleReset} 
+            className="btn btn-outline-secondary flex-grow-1"
+          >
+            Reset
+          </button>
         </div>
+      </div>
     </div>
-    );
-};
-
-const filtersContainerStyle = {
-  display: 'flex',
-  gap: '1rem',
-  marginBottom: '1.5rem',
-  backgroundColor: '#fff',
-  padding: '1.5rem',
-  borderRadius: '8px',
-  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-};
-
-const filterGroupStyle = {
-  display: 'flex',
-  alignItems: 'center',
-};
-
-const filterLabelStyle = {
-  marginRight: '0.5rem',
-  fontWeight: 'bold',
-  color: '#555',
-};
-
-const filterInputStyle = {
-  padding: '0.75rem',
-  borderRadius: '6px',
-  border: '1px solid #ccc',
-  fontSize: '0.8rem',
-  minWidth: '150px',
-};
-
-const filterSelectStyle = {
-  padding: '0.75rem',
-  borderRadius: '6px',
-  border: '1px solid #ccc',
-  fontSize: '1rem',
-  minWidth: '120px',
-};
-
-const filterButtonGroupStyle = {
-  display: 'flex',
-  gap: '0.5rem',
-  marginTop: '1rem',
-};
-
-const filterButtonStyle = {
-  padding: '0.75rem 1rem',
-  borderRadius: '8px',
-  border: 'none',
-  backgroundColor: '#007bff',
-  color: '#fff',
-  cursor: 'pointer',
-  fontSize: '0.8rem',
-  transition: 'background-color 0.3s ease',
-
-  '&:hover': {
-    backgroundColor: '#0056b3',
-  },
+  );
 };
 
 export default Filters;

@@ -28,6 +28,26 @@
   color: #61dafb;
 }
 
+.app-title {
+  text-align: center;
+  width: 100%;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--color-primary);
+  position: relative;
+}
+
+.app-title::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background-color: var(--color-primary);
+  margin: 0.5rem auto 0;
+  border-radius: 2px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -35,4 +55,8 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.min-h-screen {
+  min-height: 100vh;
 }
