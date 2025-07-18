@@ -88,7 +88,6 @@ export default function Metrics() {
             return (
               <div key={priority} className={`priority-metric-item ${priorityClass}`}>
                 <div className="priority-info">
-                  <div className="priority-dot"></div>
                   <span className="priority-name">{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
                 </div>
                 <div className="priority-time">{time}</div>

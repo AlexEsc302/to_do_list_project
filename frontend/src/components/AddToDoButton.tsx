@@ -41,46 +41,63 @@ const AddToDoButton: React.FC<{ onAdd: () => void }> = ({ onAdd }) => {
     setDueDate('');
   };
 
+  // Helper function to get priority dot color
+  const getPriorityColor = (selectedPriority: Priority) => {
+    switch(selectedPriority) {
+      case 'LOW':
+        return 'var(--color-priority-low)';
+      case 'MEDIUM':
+        return 'var(--color-priority-medium)';
+      case 'HIGH':
+        return 'var(--color-priority-high)';
+      default:
+        return 'var(--color-priority-low)';
+    }
+  };
+
   return (
-    <div className="mb-4">
+    <div className="add-task-container">
       <button 
         onClick={() => setShowForm(!showForm)} 
-        className={`btn ${showForm ? 'btn-outline-secondary' : 'btn-success'} d-flex align-items-center`}
+        className={`add-task-button ${showForm ? 'cancel' : 'add'}`}
       >
         {showForm ? (
           <>
-            <i className="fas fa-times me-2"></i> 
+            <i className="fas fa-times"></i> 
             Cancel
           </>
         ) : (
           <>
-            <i className="fas fa-plus me-2"></i>
+            <i className="fas fa-plus"></i>
             Add New Task
           </>
         )}
       </button>
 
       {showForm && (
-        <div className="card mt-3 shadow-sm">
-          <div className="card-header bg-light">
-            <h5 className="mb-0">Create New Task</h5>
+        <div className="add-task-form-container">
+          <div className="add-task-header">
+            <i className="fas fa-clipboard-list add-task-header-icon"></i>
+            <h5 className="add-task-title">Create New Task</h5>
           </div>
-          <div className="card-body">
+          <div className="add-task-form">
             <form onSubmit={handleSubmit}>
-              <div className="mb-3">
+              <div className="form-group">
                 <label htmlFor="name" className="form-label">Task Name</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  placeholder="Enter task name"
-                />
+                <div className="input-container">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    placeholder="Enter task name"
+                  />
+                </div>
               </div>
               
-              <div className="mb-3">
+              <div className="form-group">
                 <label htmlFor="description" className="form-label">Description</label>
                 <textarea
                   className="form-control"
@@ -92,52 +109,66 @@ const AddToDoButton: React.FC<{ onAdd: () => void }> = ({ onAdd }) => {
                 />
               </div>
               
-              <div className="row mb-3">
-                <div className="col-md-6">
+              <div className="form-row">
+                <div className="form-group-half">
                   <label htmlFor="priority" className="form-label">Priority</label>
-                  <select
-                    className="form-select"
-                    id="priority"
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value as Priority)}
-                  >
-                    <option value="LOW">Low</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="HIGH">High</option>
-                  </select>
+                  <div className="priority-select-container">
+                    <div 
+                      className="priority-dot" 
+                      style={{ backgroundColor: getPriorityColor(priority) }}
+                    ></div>
+                    <select
+                      className="priority-select"
+                      id="priority"
+                      value={priority}
+                      onChange={(e) => setPriority(e.target.value as Priority)}
+                    >
+                      <option value="LOW">Low</option>
+                      <option value="MEDIUM">Medium</option>
+                      <option value="HIGH">High</option>
+                    </select>
+                  </div>
                 </div>
                 
-                <div className="col-md-6">
+                <div className="form-group-half">
                   <label htmlFor="dueDate" className="form-label">Due Date</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="dueDate"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                  />
+                  <div className="date-input-container">
+                    <i className="fas fa-calendar-alt"></i>
+                    <input
+                      type="date"
+                      className="form-control date-input"
+                      id="dueDate"
+                      value={dueDate}
+                      onChange={(e) => setDueDate(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
               
-              <div className="d-flex justify-content-end">
+              <div className="form-actions">
                 <button 
                   type="button" 
-                  className="btn btn-outline-secondary me-2"
+                  className="btn-cancel"
                   onClick={resetForm}
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="btn btn-primary"
+                  className="btn-create"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                       Creating...
                     </>
-                  ) : 'Create Task'}
+                  ) : (
+                    <>
+                      <i className="fas fa-check"></i>
+                      Create Task
+                    </>
+                  )}
                 </button>
               </div>
             </form>

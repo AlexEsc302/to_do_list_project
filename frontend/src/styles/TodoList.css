@@ -192,6 +192,8 @@
 
 .filter-section {
   margin-bottom: var(--space-3);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .filter-label {
@@ -209,6 +211,8 @@
   width: 100%;
   background-color: var(--color-surface);
   transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .filter-select:focus,
@@ -220,6 +224,7 @@
 
 .filter-input-group {
   position: relative;
+  width: 100%;
 }
 
 .filter-input-icon {
@@ -237,6 +242,8 @@
   padding: var(--space-2) var(--space-2) var(--space-2) var(--space-6);
   width: 100%;
   background-color: var(--color-surface);
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .filter-actions {
@@ -250,10 +257,14 @@
 .status-priority-container {
   display: flex;
   gap: var(--space-4);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .filter-field-half {
   flex: 1;
+  min-width: 0; /* Prevents flex item from overflowing */
+  box-sizing: border-box;
 }
 
 @media (max-width: 576px) {
@@ -488,10 +499,300 @@
   }
 }
 
+/* Add New Task Styles */
+.add-task-container {
+  margin-bottom: var(--space-5);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.add-task-button {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal) var(--transition-timing-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.add-task-button.add {
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+}
+
+.add-task-button.add:hover {
+  background-color: var(--color-success-dark);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.add-task-button.cancel {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.add-task-button.cancel:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--color-text-primary);
+}
+
+.add-task-button i {
+  font-size: var(--font-size-lg);
+  margin-right: var(--space-2);
+}
+
+.add-task-form-container {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-4);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  animation: fadeSlideDown var(--transition-normal) var(--transition-timing-entry);
+}
+
+.add-task-form-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(to right, var(--color-success-light), var(--color-success));
+}
+
+.add-task-header {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background-color: rgba(76, 175, 80, 0.05);
+}
+
+.add-task-header-icon {
+  color: var(--color-success);
+  font-size: var(--font-size-xl);
+  margin-right: var(--space-3);
+}
+
+.add-task-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.add-task-form {
+  padding: var(--space-5);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group {
+  margin-bottom: var(--space-4);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-row {
+  display: flex;
+  gap: var(--space-4);
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: var(--space-4);
+}
+
+.form-group-half {
+  flex: 1;
+  min-width: 0; /* Prevents overflow in flex items */
+  box-sizing: border-box;
+}
+
+.form-label {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.form-control {
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  font-size: var(--font-size-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.form-control:focus {
+  border-color: var(--color-success-light);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  outline: none;
+}
+
+.input-container {
+  position: relative;
+  width: 100%;
+}
+
+.priority-select-container {
+  position: relative;
+  width: 100%;
+}
+
+.priority-select {
+  width: 100%;
+  padding: var(--space-3);
+  padding-left: var(--space-6);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  font-size: var(--font-size-md);
+  appearance: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.priority-select:focus {
+  border-color: var(--color-success-light);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  outline: none;
+}
+
+.priority-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.date-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.date-input-container i {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+  z-index: 1;
+}
+
+.date-input {
+  padding-left: var(--space-6);
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.btn-cancel {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  border: 1px solid var(--color-border);
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.btn-cancel:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--color-text-primary);
+}
+
+.btn-create {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  background-color: var(--color-success);
+  color: white;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.btn-create:hover:not(:disabled) {
+  background-color: var(--color-success-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-create:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .add-task-container {
+    width: 95%;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  
+  .form-group-half {
+    width: 100%;
+    margin-bottom: var(--space-3);
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+  
+  .add-task-form {
+    padding: var(--space-4) var(--space-3);
+  }
+  
+  .add-task-header {
+    padding: var(--space-3);
+  }
+}
+
 .select-with-indicator {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .select-with-indicator .priority-dot,
@@ -504,4 +805,6 @@
 .select-with-indicator .filter-select {
   padding-left: 30px;
   width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
