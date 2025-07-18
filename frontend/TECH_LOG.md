@@ -138,6 +138,44 @@
 - Added specific error handling for network issues
 - Improved visual feedback for loading and error states
 
+## Testing Improvements
+
+### 1. Test Framework Enhancement
+- Fixed failing tests across all components
+- Updated selectors to be more robust against UI changes
+- Improved async test handling with proper waitFor calls
+- Added more reliable element selection strategies
+- Resolved DOM structure changes that caused test failures
+
+### 2. Component Test Fixes
+- **TodoTable Tests**:
+  - Fixed priority sort button selector to handle multiple matches
+  - Updated error message and loading text assertions
+  - Improved test stability for async operations
+  - Enhanced sorting test reliability
+  
+- **AddToDoButton Tests**:
+  - Fixed form validation test to handle JSDOM limitations
+  - Improved submit event handling in tests
+  - Enhanced cancel button functionality tests
+  - Fixed preventDefault mock implementation
+
+- **Filters Tests**:
+  - Updated selectors to match actual component implementation
+  - Fixed header element selection
+  - Improved filter state testing
+  
+- **Metrics Tests**:
+  - Updated error state assertions
+  - Fixed loading state detection
+
+### 3. Test Architecture Improvements
+- Better handling of mock implementations
+- Added proper cleanup for mocks in tests
+- Improved TypeScript typing in test files
+- Enhanced test isolation for more reliable results
+- Fixed act() warnings by properly wrapping state updates
+
 ## Code Quality Improvements
 - Standardized API call patterns across components
 - Improved component architecture for better separation of concerns
