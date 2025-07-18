@@ -31,124 +31,72 @@ export default function Metrics() {
   }, []);
 
   if (loading) {
-    return <div style={loadingStyle}>Loading metrics...</div>;
+    return <div className="metrics-loading">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+      <span>Loading metrics...</span>
+    </div>;
   }
 
   if (error) {
-    return <div style={errorBoxStyle}>{error}</div>;
+    return <div className="metrics-error">
+      <i className="fas fa-exclamation-circle me-2"></i>
+      {error}
+    </div>;
   }
 
   if (!metrics) {
-    return <div style={errorBoxStyle}>No metrics available.</div>;
+    return <div className="metrics-error">
+      <i className="fas fa-info-circle me-2"></i>
+      No metrics available.
+    </div>;
   }
 
   return (
-    <div style={metricsContainerStyle}>
-      <h2 style={metricsTitleStyle}>Task Metrics</h2>
-      <div style={metricItemStyle}>
-        <strong style={strongStyle}>Average time to finish tasks:</strong>
-        <span style={valueStyle}>{metrics.overall}</span>
+    <div className="metrics-container">
+      <div className="metrics-header">
+        <i className="fas fa-chart-bar metrics-icon"></i>
+        <h2 className="metrics-title">Task Metrics</h2>
       </div>
-      <div style={metricItemStyle}>
-        <strong style={strongStyle}>Total tasks completed:</strong>
-        <span style={valueStyle}>{metrics.doneCount}</span>
+
+      <div className="metrics-summary">
+        <div className="metric-card">
+          <div className="metric-content">
+            <div className="metric-label">Average Time to Complete</div>
+            <div className="metric-value">{metrics.overall}</div>
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-content">
+            <div className="metric-label">Tasks Completed</div>
+            <div className="metric-value">{metrics.doneCount}</div>
+          </div>
+        </div>
       </div>
-      <div>
-        <h3 style={priorityTitleStyle}>Average time by priority:</h3>
-        <ul style={priorityListStyle}>
-          {Object.entries(metrics.byPriority).map(([priority, time]) => (
-            <li key={priority} style={priorityItemStyle}>
-              <span style={priorityLabelStyle}>{priority.charAt(0).toUpperCase() + priority.slice(1)}:</span>
-              <span style={priorityValueStyle}>{time}</span>
-            </li>
-          ))}
-        </ul>
+
+      <div className="metrics-detail">
+        <h3 className="metrics-subtitle">
+          <i className="fas fa-clock me-2"></i>
+          Average Time by Priority
+        </h3>
+        
+        <div className="priority-metrics">
+          {Object.entries(metrics.byPriority).map(([priority, time]) => {
+            const priorityClass = `priority-${priority.toLowerCase()}`;
+            return (
+              <div key={priority} className={`priority-metric-item ${priorityClass}`}>
+                <div className="priority-info">
+                  <div className="priority-dot"></div>
+                  <span className="priority-name">{priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
+                </div>
+                <div className="priority-time">{time}</div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 }
-
-const loadingStyle = {
-  padding: '1rem',
-  textAlign: 'center' as const,
-  color: '#666',
-};
-
-const errorBoxStyle = {
-  padding: '1rem',
-  textAlign: 'center' as const,
-  color: '#dc3545',
-  backgroundColor: '#fff',
-  borderRadius: '8px',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
-  marginTop: '2rem',
-};
-
-const metricsContainerStyle = {
-  backgroundColor: '#fff',
-  padding: '2rem',
-  borderRadius: '8px',
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
-  marginTop: '2rem',
-};
-
-const metricsTitleStyle = {
-  color: '#333',
-  fontSize: '1.75rem',
-  fontWeight: 'bold',
-  marginBottom: '1.5rem',
-  borderBottom: '2px solid #eee',
-  paddingBottom: '0.75rem',
-};
-
-const metricItemStyle = {
-  marginBottom: '1rem',
-  fontSize: '1rem',
-};
-
-const strongStyle = {
-  fontWeight: 'bold',
-  color: '#555',
-  marginRight: '0.5rem',
-};
-
-const valueStyle = {
-  color: '#007bff',
-};
-
-const priorityTitleStyle = {
-  color: '#333',
-  fontSize: '1.25rem',
-  marginTop: '1.5rem',
-  marginBottom: '0.75rem',
-};
-
-const priorityListStyle = {
-  listStyleType: 'none',
-  padding: 0,
-};
-
-const priorityItemStyle = {
-  padding: '0.5rem 0',
-  borderBottom: '1px dashed #eee',
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-};
-
-const priorityLabelStyle = {
-  color: '#777',
-};
-
-const priorityValueStyle = {
-  color: '#28a745',
-  fontWeight: 'bold',
-};
-
-const errorStyle = {
-  color: '#dc3545',
-  padding: '1rem',
-  backgroundColor: '#f8d7da',
-  borderRadius: '4px',
-  border: '1px solid #f5c6cb',
-};

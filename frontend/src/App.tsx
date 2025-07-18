@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import './styles/design-system.css';
+import './styles/TodoList.css';
 
 import Filters from './components/Filters';
 import TodoTable from './components/TodoTable';

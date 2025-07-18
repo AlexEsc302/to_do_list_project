@@ -85,7 +85,7 @@ const TodoCard: React.FC<TodoCardProps> = ({ todo, onUpdate, onDelete }) => {
   const dueDateStatus = getDueDateStatus(todo.dueDate || undefined);
 
   return (
-    <div style={{
+    <div className="todo-card" style={{
       ...cardStyle,
       borderLeft: `4px solid ${getPriorityColor(todo.priority)}`,
       opacity: todo.done ? 0.8 : 1,
@@ -270,9 +270,8 @@ const TodoCard: React.FC<TodoCardProps> = ({ todo, onUpdate, onDelete }) => {
 const cardStyle = {
   backgroundColor: '#ffffff',
   borderRadius: '8px',
-  padding: '16px',
   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-  marginBottom: '16px',
+  marginBottom: '0',
   transition: 'all 0.3s ease',
 };
 

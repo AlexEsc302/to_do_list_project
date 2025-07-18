@@ -145,12 +145,13 @@ const TodoTable: React.FC<Props> = ({ filters }) => {
       ) : (
         <div className="todo-list">
           {todos.map(todo => (
-            <TodoCard 
-              key={todo.id}
-              todo={todo}
-              onUpdate={handleUpdateTodo}
-              onDelete={handleDeleteTodo}
-            />
+            <div className="todo-card-container mb-3" key={todo.id}>
+              <TodoCard 
+                todo={todo}
+                onUpdate={handleUpdateTodo}
+                onDelete={handleDeleteTodo}
+              />
+            </div>
           ))}
         </div>
       )}
